@@ -1,0 +1,95 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Nop.Data;
+
+namespace Nop.Plugin.Widget.PromoSlider.Data
+{
+    public class PromoSliderObjectContext : DbContext, IDbContext
+    {
+        public bool ProxyCreationEnabled
+        {
+            get
+            {
+                return true;
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool AutoDetectChangesEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public PromoSliderObjectContext(string nameOrConnectionString) : base(nameOrConnectionString) { }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Configurations.Add(new PromoSliderMap());
+            modelBuilder.Configurations.Add(new PromoImageMap());
+            base.OnModelCreating(modelBuilder);
+        }
+
+        protected string CreateDatabaseInstallationScript()
+        {
+            string scripts = ((IObjectContextAdapter)this).ObjectContext.CreateDatabaseScript();
+            return scripts;
+        }
+
+        public void Install()
+        {
+            Database.SetInitializer<PromoSliderObjectContext>(null);
+            Database.ExecuteSqlCommand(CreateDatabaseInstallationScript());
+            SaveChanges();
+        }
+
+        public void Uninstall()
+        {
+            this.DropPluginTable("PromoSlider_PromoImages");
+            this.DropPluginTable("PromoSlider_PromoSliders");
+        }
+
+        public new IDbSet<TEntity> Set<TEntity>() where TEntity : Core.BaseEntity
+        {
+            return base.Set<TEntity>();
+        }
+
+
+        public int ExecuteSqlCommand(string sql, bool doNotEnsureTransaction = false, int? timeout = null, params object[] parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<TEntity> ExecuteStoredProcedureList<TEntity>(string commandText, params object[] parameters) where TEntity : Core.BaseEntity, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        
+        public IEnumerable<TElement> SqlQuery<TElement>(string sql, params object[] parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Detach(object entity)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
